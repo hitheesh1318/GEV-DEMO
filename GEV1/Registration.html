@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Details Form</title>
+
+  <link rel="stylesheet" href="reg_style.css"/>
+
+  <!-- Optional XLSX for .xlsx export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <script>
+    // ROLE GUARD: block TL/Manager even if this page is opened directly
+    document.addEventListener('DOMContentLoaded', () => {
+      const role = localStorage.getItem('current_user_role') || 'wfm';
+      if (role !== 'wfm') {
+        document.body.innerHTML = `
+          <div style="min-height:100vh;display:grid;place-items:center;background:#f8fafc;padding:24px;">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;max-width:600px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+              <h2 style="margin:0 0 8px;color:#0f172a;">403 • Access Denied</h2>
+              <p style="margin:0 0 16px;color:#64748b;">You do not have permission to view the Registration page.</p>
+              <button onclick="if(window.top) window.top.focus();" style="padding:10px 14px;border:none;border-radius:8px;background:#4f46e5;color:#fff;font-weight:700;cursor:pointer;">Return</button>
+            </div>
+          </div>`;
+      }
+    });
+  </script>
+
+  <script src="reg_script.js" defer></script>
+</head>
+<body>
+  <div class="page">
+    <form id="employeeForm" class="form" target="_self" novalidate>
+      <h1 class="form__title">Employee Details</h1>
+
+      <!-- EmpID -->
+      <div class="form__field">
+        <label for="empId" class="required">EmpID</label>
+        <input id="empId" name="empId" type="text" placeholder="e.g., 123456" required />
+      </div>
+
+      <!-- Name -->
+      <div class="form__field">
+        <label for="empName" class="required">Name</label>
+        <input id="empName" name="empName" type="text" placeholder="Full name" required />
+      </div>
+
+      <!-- Status -->
+      <div class="form__field">
+        <label for="status" class="required">Status</label>
+        <select id="status" name="status" required>
+          <option value="" disabled selected>-- Select --</option>
+          <option>Active</option>
+          <option>In-active</option>
+        </select>
+      </div>
+
+      <!-- BGV status -->
+      <div class="form__field">
+        <label for="bgvStatus" class="required">BGV status</label>
+        <select id="bgvStatus" name="bgvStatus" required>
+          <option value="" disabled selected>-- Select --</option>
+          <option>Green</option>
+          <option>Red</option>
+        </select>
+      </div>
+
+      <!-- Level -->
+      <div class="form__field">
+        <label for="level" class="required">Level</label>
+        <select id="level" name="level" required>
+          <option value="" disabled selected>-- Select --</option>
+          <option>2A</option>
+          <option>3A</option>
+        </select>
+      </div>
+
+      <!-- Team Lead -->
+      <div class="form__field">
+        <label for="teamLead" class="required">Team Lead</label>
+        <select id="teamLead" name="teamLead" required>
+          <option value="" disabled selected>-- Select --</option>
+          <option>Captain America</option>
+          <option>Iron Man</option>
+          <option>Marvels</option>
+        </select>
+      </div>
+
+      <!-- SME -->
+      <div class="form__field">
+        <label for="sme" class="required">SME</label>
+        <select id="sme" name="sme" required>
+          <option value="" disabled selected>-- Select --</option>
+          <option>SME 1</option>
+          <option>SME 2</option>
+        </select>
+      </div>
+
+      <!-- Roles -->
+      <div class="form__field">
+        <label for="role" class="required">Roles</label>
+        <select id="role" name="role" required>
+          <option value="" disabled selected>-- Select --</option>
+          <option>L1</option>
+          <option>L1.5</option>
+        </select>
+      </div>
+
+      <!-- Date of joining -->
+      <div class="form__field">
+        <label for="doj">Date of joining</label>
+        <input id="doj" name="doj" type="date" />
+      </div>
+
+      <!-- Infosys Tenurity -->
+      <div class="form__field">
+        <label for="infyTenure">Infosys Tenurity (years)</label>
+        <input id="infyTenure" name="infyTenure" type="number" min="0" step="0.1" placeholder="e.g., 2.5" />
+      </div>
+
+      <!-- GEV DoJ -->
+      <div class="form__field">
+        <label for="gevDoj">GEV Date of joining</label>
+        <input id="gevDoj" name="gevDoj" type="date" />
+      </div>
+
+      <!-- GEV Tenurity -->
+      <div class="form__field">
+        <label for="gevTenure">GEV Tenurity (years)</label>
+        <input id="gevTenure" name="gevTenure" type="number" min="0" step="0.1" placeholder="e.g., 1.0" />
+      </div>
+
+      <!-- Last date in Project -->
+      <div class="form__field">
+        <label for="lastDoj">Last date in Project</label>
+        <input id="lastDoj" name="lastDoj" type="date" />
+      </div>
+
+      <!-- Mobile Number -->
+      <div class="form__field">
+        <label for="mobile">Mobile Number</label>
+        <input id="mobile" name="mobile" type="tel" inputmode="tel" placeholder="+91-XXXXXXXXXX" />
+      </div>
+
+      <!-- Secondary Contact Number -->
+      <div class="form__field">
+        <label for="secondaryMobile">Secondary Contact Number</label>
+        <input id="secondaryMobile" name="secondaryMobile" type="tel" inputmode="tel" placeholder="+91-XXXXXXXXXX" />
+      </div>
+
+      <!-- Emergency Contact Number -->
+      <div class="form__field">
+        <label for="emergencyContact">Emergency Contact Number</label>
+        <input id="emergencyContact" name="emergencyContact" type="tel" inputmode="tel" placeholder="+91-XXXXXXXXXX" />
+      </div>
+
+      <!-- Present Address -->
+      <div class="form__field form__field--full">
+        <label for="presentAddress">Present Address</label>
+        <textarea id="presentAddress" name="presentAddress" rows="4" placeholder="Flat / House No, Street, City, State, PIN"></textarea>
+      </div>
+
+      <!-- Area -->
+      <div class="form__field form__field--full">
+        <label for="area">Area</label>
+        <textarea id="area" name="area" rows="3" placeholder="Locality / Area details"></textarea>
+      </div>
+
+      <!-- Transport/Route No -->
+      <div class="form__field">
+        <label for="routeNo">Transport / Route No</label>
+        <input id="routeNo" name="routeNo" type="text" placeholder="e.g., R-12" />
+      </div>
+
+      <!-- Domain -->
+      <div class="form__field">
+        <label for="domain">Domain (ENTERPRISE)</label>
+        <input id="domain" name="domain" type="text" placeholder="ENTERPRISE / INFOPROJ" />
+      </div>
+
+      <!-- Infosys -->
+      <div class="form__field">
+        <label for="infyId">Infosys</label>
+        <input id="infyId" name="infyId" type="text" placeholder="e.g., INxxxxxx" />
+      </div>
+
+      <!-- Asset Tag -->
+      <div class="form__field">
+        <label for="assetTag">Asset Tag</label>
+        <input id="assetTag" name="assetTag" type="text" placeholder="e.g., LAP-XXXX" />
+      </div>
+
+      <!-- Laptop Received -->
+      <div class="form__field">
+        <label for="laptopReceived" class="required">Laptop Received</label>
+        <select id="laptopReceived" name="laptopReceived" required>
+          <option value="" disabled selected>-- Select --</option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <!-- Domain Experience -->
+      <div class="form__field">
+        <label for="domainExp">Domain Experience (years)</label>
+        <input id="domainExp" name="domainExp" type="number" min="0" step="0.1" placeholder="e.g., 3.0" />
+      </div>
+
+      <!-- Infosys Experience -->
+      <div class="form__field">
+        <label for="infyExp">Infosys Experience (years)</label>
+        <input id="infyExp" name="infyExp" type="number" min="0" step="0.1" placeholder="e.g., 1.0" />
+      </div>
+
+      <!-- Overall Experience -->
+      <div class="form__field">
+        <label for="overallExp">Overall Experience (years)</label>
+        <input id="overallExp" name="overallExp" type="number" min="0" step="0.1" placeholder="e.g., 4.0" />
+      </div>
+
+      <!-- Passport -->
+      <div class="form__field">
+        <label for="passport" class="required">Passport</label>
+        <select id="passport" name="passport" required>
+          <option value="" disabled selected>-- Select --</option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <!-- Actions -->
+      <div class="form__actions">
+        <button type="button" id="btnPdf" class="btn btn--ghost">Export PDF</button>
+        <button type="button" id="btnExcel" class="btn btn--ghost">Export Excel (CSV)</button>
+        <button type="button" id="btnXlsx" class="btn btn--ghost">Export Excel (.xlsx)</button>
+        <button type="submit" class="btn btn--primary">Submit</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

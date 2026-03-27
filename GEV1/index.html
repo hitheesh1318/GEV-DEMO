@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>QuantumTrack Elite Dashboard</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css"/>
+
+  <!-- XLSX for export (Dashboard + Registration + Directory .xlsx if needed) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+
+  <!-- App JS -->
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <!-- Login Overlay -->
+  <div id="loginOverlay" class="login-screen">
+    <div class="login-box">
+      <h2 style="text-align:center; color:#1e293b;">GE Vernova<span>Track</span> Login</h2>
+      <div class="input-group">
+        <label>Select Role</label>
+        <select id="roleSelect">
+          <option value="wfm">Workforce Manager (WFM)</option>
+          <option value="tl">Team Lead (TL)</option>
+          <option value="manager">Operations Manager</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" value="123456">
+      </div>
+      <button onclick="login()" class="btn btn-primary" style="width:100%">Enter Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo-area">GE Vernova</div>
+    <div style="margin-top:20px">
+      <p style="color:#64748b; font-size:12px;">MAIN MENU</p>
+      <nav>
+        <a href="#" class="nav-link" data-view="dashboard">
+          <div style="padding:10px 0; color:#818cf8; font-weight:bold;">Dashboard</div>
+        </a>
+        <a href="#" class="nav-link" data-view="registration">
+          <div style="padding:10px 0; color:#818cf8; font-weight:bold;">Registration</div>
+        </a>
+        <a href="#" class="nav-link" data-view="directory">
+          <div style="padding:10px 0; color:#818cf8; font-weight:bold;">Employee Directory</div>
+        </a>
+        <div style="padding:10px 0; color:#94a3b8;">Settings</div>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="top-nav">
+      <div class="search">
+        <button class="toggle-btn" aria-label="Toggle sidebar">
+          <span class="icon">☰</span>
+        </button>
+
+        <label class="mode-label">Mode</label>
+        <select id="dateMode" onchange="onDateModeChange()" class="btn mode-select">
+          <option value="single">Single</option>
+          <option value="range">Range</option>
+        </select>
+
+        <!-- Single -->
+        <input type="date" id="singleDate" onchange="onSingleDateChange()" class="btn date-input single-input" />
+
+        <!-- Range -->
+        <label class="range-label" id="fromLabel">From</label>
+        <input type="date" id="fromDate" onchange="renderData()" class="btn date-input range-input" />
+        <label class="range-label" id="toLabel">To</label>
+        <input type="date" id="toDate" onchange="renderData()" class="btn date-input range-input" />
+      </div>
+
+      <div class="user-info">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by name, EMP ID, or TL..."
+          class="btn search-box"
+          style="border:1px solid #ddd"
+        />
+        <span id="userName" style="margin:0 15px; font-weight:600;"></span>
+        <button id="btnExportAttendance" onclick="exportExcel()" class="btn btn-export">Export to Excel</button>
+        <button onclick="logout()" class="btn btn-primary" style="background:#f1f5f9; color:#475569; margin-left:10px;">Logout</button>
+      </div>
+    </div>
+
+    <!-- ===== View: Dashboard ===== -->
+    <section id="view-dashboard" class="container">
+      <div class="stats-row">
+        <div class="stat-card">
+          <h4>Headcount</h4>
+          <div class="value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <h4>Present</h4>
+          <div class="value" id="statPresent" style="color:#10b981">0 (0%)</div>
+        </div>
+        <div class="stat-card upl">
+          <h4>UPL/SL</h4>
+          <div class="value" id="statShrink">0%</div>
+        </div>
+        <div class="stat-card shrink">
+          <h4>Attrition</h4>
+          <div class="value" id="statAttrition">0%</div>
+        </div>
+      </div>
+
+      <div class="data-card">
+        <div class="table-header">
+          <h3>Daily Attendance Registry</h3>
+        </div>
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>EMP ID</th>
+              <th>NAME</th>
+              <th>TEAM LEAD</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== View: IFRAME container (Registration / Directory) ===== -->
+    <section id="view-iframe" class="frame-wrap" style="display:none;">
+      <iframe id="contentFrame" class="content-frame" src="" title="Embedded Page"></iframe>
+    </section>
+  </main>
+</body>
+</html>

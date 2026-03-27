@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>GE Vernova Track - Employee Management Dashboard</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <!-- XLSX for Excel export -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
+      defer
+    ></script>
+
+    <!-- Main Application Script -->
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner" style="display: none">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    <!-- Login Screen (shown if not authenticated) -->
+    <div id="loginScreen" class="login-screen">
+      <div class="login-container">
+        <div class="login-card">
+          <div class="login-header">
+            <h1>GE Vernova<span>Track</span></h1>
+            <p>Employee Management System</p>
+          </div>
+
+          <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label for="roleSelect">Select Your Role</label>
+              <select id="roleSelect" required>
+                <option value="">-- Choose Role --</option>
+                <option value="wfm">Workforce Manager (WFM)</option>
+                <option value="tl">Team Lead (TL)</option>
+                <option value="manager">Operations Manager</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="passwordInput">Password</label>
+              <input
+                type="password"
+                id="passwordInput"
+                placeholder="Enter password"
+                value="123456"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+              <span>Enter Dashboard</span>
+            </button>
+
+            <div
+              id="loginError"
+              class="error-message"
+              style="display: none"
+            ></div>
+          </form>
+
+          <div class="login-footer">
+            <p style="font-size: 12px; color: #94a3b8">
+              Demo Credentials: Password = <strong>123456</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard (shown if authenticated) -->
+    <div id="dashboardScreen" class="dashboard-layout" style="display: none">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">GE Vernova<span>Track</span></div>
+          <p class="version">v2.0</p>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <p class="nav-label">MAIN MENU</p>
+            <ul>
+              <li>
+                <a
+                  href="#"
+                  class="nav-link active"
+                  data-view="dashboard"
+                  title="View attendance dashboard"
+                >
+                  📊 Dashboard
+                </a>
+              </li>
+              <li id="regMenu" style="display: none">
+                <a
+                  href="#"
+                  class="nav-link"
+                  data-view="registration"
+                  title="Register new employees"
+                >
+                  📋 Registration
+                </a>
+              </li>
+              <li id="dirMenu" style="display: none">
+                <a
+                  href="#"
+                  class="nav-link"
+                  data-view="directory"
+                  title="Manage employee directory"
+                >
+                  👥 Employee Directory
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="nav-section mt-auto">
+            <p class="nav-label">SESSION</p>
+            <ul>
+              <li>
+                <span id="userDisplay" class="user-info">User: --</span>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  id="logoutBtn"
+                  class="nav-link logout-link"
+                  onclick="handleLogout(event)"
+                >
+                  🚪 Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <!-- Top Navigation Bar -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <button
+              class="sidebar-toggle"
+              onclick="toggleSidebar()"
+              aria-label="Toggle sidebar"
+            >
+              <span>☰</span>
+            </button>
+            <h1 class="page-title">Dashboard</h1>
+          </div>
+
+          <div class="topbar-right">
+            <span id="currentTime" class="current-time"></span>
+            <button class="btn btn-logout" onclick="handleLogout()">
+              Logout
+            </button>
+          </div>
+        </header>
+
+        <!-- Dashboard View -->
+        <section
+          id="view-dashboard"
+          class="view-content"
+          style="display: block"
+        >
+          <div class="dashboard-header">
+            <h2>Attendance Dashboard</h2>
+            <div class="dashboard-controls">
+              <label>Mode:</label>
+              <select id="dateMode" onchange="onDateModeChange()">
+                <option value="single">Single Date</option>
+                <option value="range">Date Range</option>
+              </select>
+
+              <!-- Single Date -->
+              <input
+                type="date"
+                id="singleDate"
+                class="single-input"
+                onchange="onSingleDateChange()"
+              />
+
+              <!-- Range Dates -->
+              <label class="range-label">From:</label>
+              <input
+                type="date"
+                id="fromDate"
+                class="range-input"
+                onchange="renderData()"
+                style="display: none"
+              />
+              <label class="range-label">To:</label>
+              <input
+                type="date"
+                id="toDate"
+                class="range-input"
+                onchange="renderData()"
+                style="display: none"
+              />
+
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by name or ID..."
+                class="search-box"
+              />
+              <button onclick="exportExcel()" class="btn btn-export">
+                📥 Export Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>Total Headcount</h3>
+              <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card success">
+              <h3>Present Today</h3>
+              <div class="stat-value" id="statPresent">0 (0%)</div>
+            </div>
+            <div class="stat-card warning">
+              <h3>UPL/SL</h3>
+              <div class="stat-value" id="statShrink">0%</div>
+            </div>
+            <div class="stat-card danger">
+              <h3>Attrition Rate</h3>
+              <div class="stat-value" id="statAttrition">0%</div>
+            </div>
+          </div>
+
+          <!-- Attendance Table -->
+          <div class="content-card">
+            <h3>Daily Attendance Records</h3>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Employee ID</th>
+                    <th>Name</th>
+                    <th>Team Lead</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="attendanceBody">
+                  <tr>
+                    <td colspan="4" style="text-align: center; padding: 20px">
+                      Loading...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Registration View (iframe) -->
+        <section
+          id="view-registration"
+          class="view-content iframe-view"
+          style="display: none"
+        >
+          <iframe
+            id="registrationFrame"
+            src="Registration.html"
+            title="Registration Form"
+          ></iframe>
+        </section>
+
+        <!-- Directory View (iframe) -->
+        <section
+          id="view-directory"
+          class="view-content iframe-view"
+          style="display: none"
+        >
+          <iframe
+            id="directoryFrame"
+            src="directory.html"
+            title="Employee Directory"
+          ></iframe>
+        </section>
+      </main>
+    </div>
+
+    <!-- Session State Management -->
+    <script>
+      // Check session on page load
+      window.addEventListener("load", checkSession);
+
+      // Update clock
+      setInterval(updateClock, 1000);
+
+      // Prevent back button from going to login
+      history.pushState(null, null, location.href);
+      window.onpopstate = function () {
+        history.go(1);
+      };
+    </script>
+  </body>
+</html>
